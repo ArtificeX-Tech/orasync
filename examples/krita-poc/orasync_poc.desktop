@@ -2,6 +2,7 @@
 Type=Service
 ServiceTypes=Krita/PythonPlugin
 X-KDE-Library=orasync_poc
+X-Krita-Manual=Manual.html
 X-Python-2-Compatible=false
 Name=Orasync POC
 Comment=Prototype OpenRaster Git sync bridge for orasync

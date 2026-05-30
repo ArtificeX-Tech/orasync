@@ -108,18 +108,28 @@ The Krita proof-of-concept lives in:
 examples/krita-poc/
 ```
 
+Krita 6 requires Qt6 Python bindings for Python plugins. On Arch/Parabola-style
+systems, install:
+
+```bash
+sudo pacman -S python-pyqt6
+```
+
 Copy `orasync_poc.desktop` and the `orasync_poc/` package into Krita's Python
 plugin directory, then enable "Orasync POC" in Krita's Python Plugin Manager.
 
 The POC adds actions under the Scripts/Tools menu area:
 
 - configure the project repo and `.ora` path;
-- start the `orasync watch` process;
-- stop the watcher;
-- save the active document to the configured `.ora`.
+- start live sync for the active document;
+- stop live sync;
+- export and sync the active document immediately.
 
-The watcher updates the `.ora` on disk when remote changes arrive. Automatic
-reload is best-effort; the POC shows status when a remote update was applied.
+Live sync checks the active Krita document every 2 seconds. When the document
+becomes modified, the POC exports it to the configured `.ora`, runs
+`orasync sync`, and clears Krita's modified flag. It also checks Git every 5
+seconds and reloads the active Krita document when either the remote sync or
+another local editor updates the configured `.ora`.
 
 ## GIMP POC
 
@@ -129,9 +139,9 @@ The GIMP proof-of-concept lives in:
 examples/gimp-poc/orasync-poc/
 ```
 
-Install it as a GIMP 3 Python plug-in. The POC exposes a small menu procedure
-that starts or stops a detached `orasync watch` process for a configured project
-and `.ora` file.
+Install it as a GIMP 3 Python plug-in. The POC exposes small menu procedures
+under `Filters -> Development -> Orasync`. Use "Start Orasync Live Sync" on the
+image you want to sync.
 
 On Linux, make the plug-in file executable after copying it into GIMP's plug-in
 directory:
@@ -140,9 +150,11 @@ directory:
 chmod +x orasync-poc.py
 ```
 
-GIMP plug-ins are procedure-based, so this POC is intentionally less integrated
-than the Krita one. It proves that GIMP can launch the same sync engine; future
-ArtificeX work should provide a richer persistent extension/helper layer.
+The GIMP live-sync window keeps a 2-second editor poll and a 5-second Git poll
+alive while it is open. When the image becomes dirty, the POC exports it with
+GIMP's OpenRaster exporter, runs `orasync sync`, and marks the image clean.
+When another client updates the configured `.ora`, the POC loads the new ORA in
+GIMP and closes the old clean image.
 
 ## Development
 

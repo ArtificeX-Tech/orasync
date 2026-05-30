@@ -6,7 +6,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Callable, Iterable
 
-from .errors import GitError, OrasyncError
+from .errors import GitError, LockError, OrasyncError
 from .gitrepo import GitRepo
 from .lock import ProjectLock
 from .ora import export_ora_archive, file_fingerprint, import_ora_archive
@@ -352,6 +352,8 @@ def watch(
                     if emit:
                         emit(event)
                     yield event
+        except LockError:
+            pass
         except OrasyncError as exc:
             event = _event(root, "error", str(exc), ora_path=Path(config.ora_path), error_type=type(exc).__name__)
             if emit:

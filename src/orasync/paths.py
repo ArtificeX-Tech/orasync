@@ -24,7 +24,21 @@ PROJECT_EXCLUDES = {
 }
 
 
+def looks_like_remote_url(value: str | os.PathLike[str]) -> bool:
+    text = os.fspath(value)
+    if "://" in text:
+        return True
+    if text.startswith("git@") and ":" in text:
+        return True
+    return False
+
+
 def resolve_project(project: str | os.PathLike[str]) -> Path:
+    if looks_like_remote_url(project):
+        raise ProjectLayoutError(
+            "Project must be a local Git working tree path, not a remote URL. "
+            "Use --remote-url with `orasync init` to configure the remote."
+        )
     return Path(project).expanduser().resolve()
 
 
@@ -136,4 +150,3 @@ def atomic_write_bytes(target: Path, data: bytes) -> None:
 def atomic_replace_path(temp_path: Path, target: Path) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
     os.replace(temp_path, target)
-
