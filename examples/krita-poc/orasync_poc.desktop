@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=orasync_poc
+X-Python-2-Compatible=false
+Name=Orasync POC
+Comment=Prototype OpenRaster Git sync bridge for orasync
+
